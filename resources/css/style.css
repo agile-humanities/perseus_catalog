@@ -118,6 +118,11 @@ dl {
     padding: 0 0 0.5em 0;
   }
   
-div.relatedItem {
+div.relatedItems {
     padding-left: 25px;
+}
+
+div.relatedItem {
+    padding-left: 50px;
+    border: 1px solid #dedede;
 }

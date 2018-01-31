@@ -61,6 +61,7 @@ declare function catalog:work-title($work-id as xs:string) {
     return local:trim($title)
 };
 
+
 declare function catalog:works-by($authorid as xs:string) as element()* {
     let $rec := collection('/db/PerseusCatalogData/mads')//mads:identifier[.=$authorid]/ancestor::mads:mads
     let $related-work-ids := $rec/mads:extension/mads:identifier
@@ -71,11 +72,12 @@ declare function catalog:works-by($authorid as xs:string) as element()* {
          let $ctso := cts:object($id)
        return cts:full-work-id($ctso)
       for $wid in distinct-values($work-ids)
+      order by $wid
         return <work>{ $wid }</work>
 };
 
 
-declare function catalog:works-by-old($authorid) {
+declare function catalog:works-by-older($authorid) {
     let $worklist := doc('/db/PerseusCatalogData/cite/authors.xml')//author[urn=$authorid]/related-works
     for $work in tokenize($worklist, ';')
     return <work>{$work}</work>
