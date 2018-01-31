@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<main xmlns="http://www.w3.org/1999/xhtml" data-template="templates:surround" data-template-with="templates/page2.html" data-template-at="content">
+    <header>
+        <h1>Text Groups</h1>
+    </header>
+    <a href="textgroup-index.html">Browse full list of text groups</a>
+    <form action="textgroups.html" method="get">
+        <input class="form-control" id="q" name="q" placeholder="terms"/>
+        <br/>
+        <button type="submit">Search</button>
+    </form>
+    <ul data-template="app:textgroups-list"/>
+    <div id="selected-work" data-template="app:selected-textgroup"/>
+</main>
