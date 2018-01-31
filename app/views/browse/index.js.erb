@@ -1,3 +1,0 @@
-$('#alist').html('<%= escape_javascript render :partial => "browse" %>');
-$('#pag').html('<%= escape_javascript(paginate(@auth_list, :remote => true).to_s) %>');
-$(window).scrollTop(0);
