@@ -61,26 +61,58 @@ declare function catalog:work-title($work-id as xs:string) {
     return local:trim($title)
 };
 
+declare function catalog:works-by($authorid as xs:string) as element()? {
+    collection($config:indexes)//worksby[@authorid = $authorid]
+};
 
-declare function catalog:works-by($authorid as xs:string) as element()* {
-    let $rec := collection('/db/PerseusCatalogData/mads')//mads:identifier[.=$authorid]/ancestor::mads:mads
+declare function catalog:works-by-old($authorid as xs:string) as element()* {
+    let $rec := collection($config:data-root)//mads:identifier[.=$authorid]/ancestor::mads:mads
     let $related-work-ids := $rec/mads:extension/mads:identifier
+    return
+    <relatedWorks>{
+    for $id in $related-work-ids
+     let $modsids := collection($config:data-root)//mods:identifier[@type=$id/@type and . = $id]
+    return 
+        <relatedWork id="{$id}" type="{$id/@type}">
+        {
+          for $ids in $modsids
+           let $group := normalize-space($ids/@displayLabel)
+           group by $group
+             return
+              <grouping relation="{ if ($group) then $group else "primary"}">
+              <relation>{$group}</relation>
+              {
+            for $id in $ids
+             let $uniformTitle := normalize-space(xs:string($id/ancestor::mods:mods/mods:titleInfo[@type='uniform']))
+             let $ctsurn := $id/ancestor::mods:mods/mods:identifier[@type='ctsurn']
+             group by $uniformTitle              
+              return
+                <work id="{$id[1]/text()}" type="{$id[1]/@type}">
+                 <label>{$uniformTitle}</label>
+                     { for $urn in $ctsurn return
+                        <expression ctsurn="{$urn}">
+                          <label>{ $id/ancestor::mods:mods/mods:titleInfo[not(@type='uniform')][1]/mods:title/text()}</label>
+                        </expression>
+                     }
+                </work>
+              }
+              </grouping>
+        }
+        </relatedWork>
+        }</relatedWorks>
+};
+
+declare function catalog:works-by-older($authorid as xs:string) as element()* {
+    let $rec := collection('/db/PerseusCatalogData/mads')//mads:identifier[.=$authorid]/ancestor::mads:mads
     let $work-ids :=
-     for $id in $related-work-ids
-      let $mods-ids := collection('/db/PerseusCatalogData/mods')//mods:identifier[. = $id]/ancestor::mods:mods/mods:identifier[@type='ctsurn']
-       for $id in $mods-ids
+     for $id in $rec/mads:extension/mads:identifier
+      let $matching-mods-ids := collection('/db/PerseusCatalogData/mods')//mods:identifier[. = $id]
+       for $id in $matching-mods-ids/ancestor::mods:mods/mods:identifier[@type='ctsurn']
          let $ctso := cts:object($id)
        return cts:full-work-id($ctso)
       for $wid in distinct-values($work-ids)
       order by $wid
         return <work>{ $wid }</work>
-};
-
-
-declare function catalog:works-by-older($authorid) {
-    let $worklist := doc('/db/PerseusCatalogData/cite/authors.xml')//author[urn=$authorid]/related-works
-    for $work in tokenize($worklist, ';')
-    return <work>{$work}</work>
 };
 
 

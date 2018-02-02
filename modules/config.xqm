@@ -31,6 +31,8 @@ declare variable $config:app-root :=
 
 declare variable $config:data-root := "/db/PerseusCatalogData";
 
+declare variable $config:indexes := concat($config:data-root, '/indexes');
+
 declare variable $config:repo-descriptor := doc(concat($config:app-root, "/repo.xml"))/repo:meta;
 
 declare variable $config:expath-descriptor := doc(concat($config:app-root, "/expath-pkg.xml"))/expath:package;

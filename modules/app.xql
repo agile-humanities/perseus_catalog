@@ -418,7 +418,7 @@ declare
 function app:index-topics($node as node(), $model as map(*))
 {
     <ul>{
-        for $topic in doc('/db/PerseusCatalogData/indexes/topics.xml')//topic
+        for $topic in collection('/db/PerseusCatalogData/indexes/topics')//topic
         order by $topic
         return
             <li>

@@ -40,8 +40,13 @@ declare function local:subject-index()
         <subjects count="{count($index-recs)}">{ $index-recs }</subjects>      
 };
 
-let $subjects := local:subject-index()
-for $subject in $subjects/subject
+let $removeCollection :=
+    if (xmldb:collection-available('/db/PerseusCatalogData/indexes/subjects'))
+        then xmldb:remove('/db/PerseusCatalogData/indexes/subjects')
+    else ()
+let $createCollection := xmldb:create-collection('/db/PerseusCatalogData/indexes', 'subjects')
+
+for $subject in local:subject-index()/subject
 let $docname := string-join(($subject/@key, 'xml'),'.')
 return
     xmldb:store('/db/PerseusCatalogData/indexes/subjects', $docname, $subject)

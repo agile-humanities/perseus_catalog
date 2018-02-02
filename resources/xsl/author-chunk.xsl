@@ -13,13 +13,13 @@
     <xsl:template match="author">
         <section>
             <header>
-                <h2>
+                <h1>
                     <xsl:apply-templates select="name/authorized"/>
-                </h2>
+                </h1>
             </header>
             <div>
                 <header>
-                    <h3>Identifiers</h3>
+                    <h2>Identifiers</h2>
                 </header>
                 <dl>
                     <xsl:apply-templates select="ids"/>
@@ -27,27 +27,34 @@
             </div>
             <div>
                 <header>
-                    <h3>Fields of Activity</h3>
+                    <h2>Fields of Activity</h2>
                 </header>
                 <ul>
                     <xsl:apply-templates select="fieldsOfActivity"/>
                 </ul>
             </div>
-            
+
             <div>
-                <h3>Links</h3>
+                <h2>Links</h2>
                 <ul>
                     <xsl:apply-templates select="links"/>
                 </ul>
             </div>
             <div>
-                <h3>Works</h3>
+                <h2>Works</h2>
                 <ul>
-                    <xsl:apply-templates select="works"/>
+                    <xsl:for-each select="worksby/work">
+                        <xsl:sort select="label"/>
+                        <li>
+                            <a href="works.html?id={@ctsurn}">
+                                <xsl:apply-templates select="label"/>
+                            </a>
+                        </li>
+                    </xsl:for-each>
                 </ul>
             </div>
             <div>
-                <h3>Variant Names</h3>
+                <h2>Variant Names</h2>
                 <ul>
                     <xsl:apply-templates select="name/variants"/>
                 </ul>
@@ -55,12 +62,44 @@
         </section>
     </xsl:template>
 
-    <xsl:template match="works">
-        <li>
-            <a href="works.html?id={id}">
-                <xsl:apply-templates select="label"/>
-            </a>
-        </li>
+
+
+    <xsl:template match="relatedWork">
+        <xsl:apply-templates select="grouping[@relation = 'primary']"/>
+    </xsl:template>
+
+    <xsl:template match="grouping">
+        <div class="grouping">
+            <header>
+                <h4>
+                    <xsl:apply-templates select="relation"/>
+                </h4>
+            </header>
+            <xsl:apply-templates select="work"/>
+        </div>
+    </xsl:template>
+
+    <xsl:template match="work">
+        <div class="work">
+            <header>
+                <h5>
+                    <xsl:apply-templates select="label"/>
+                </h5>
+            </header>
+            <ul>
+                <xsl:for-each select="expression">
+                    <li>
+                        <xsl:apply-templates select="current()"/>
+                    </li>
+                </xsl:for-each>
+            </ul>
+        </div>
+    </xsl:template>
+
+    <xsl:template match="expression">
+        <a href="versions.html?id={@ctsurn}">
+            <xsl:value-of select="@ctsurn"/>
+        </a>
     </xsl:template>
 
     <xsl:template match="links">
@@ -73,13 +112,13 @@
             </a>
         </li>
     </xsl:template>
-    
+
     <xsl:template match="variants">
         <li>
             <xsl:apply-templates/>
         </li>
     </xsl:template>
-    
+
     <xsl:template match="fieldsOfActivity">
         <li>
             <a>
@@ -90,7 +129,7 @@
             </a>
         </li>
     </xsl:template>
-    
+
     <xsl:template match="ids">
         <dt>
             <xsl:apply-templates select="type"/>

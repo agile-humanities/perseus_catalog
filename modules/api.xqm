@@ -340,11 +340,6 @@ declare
  };
 
 
-declare function api:author-response-test($author-rec as item()) as item() {
-    for $work in catalog:works-by(catalog:primary-author-id($author-rec))
-                    return $work
-};
-
 declare function api:author-response($author-rec as item()) as item() {
            <author>
                 <id>{ xs:string($author-rec/mads:identifier[@type='citeurn']) }</id>
@@ -376,15 +371,7 @@ declare function api:author-response($author-rec as item()) as item() {
                         </ids>
                 }
                 {
-                    for $work in catalog:works-by(xs:string($author-rec/mads:identifier[@type='citeurn']))
-                    let $id := xs:string($work)
-                    let $label := catalog:work-title($id)
-                    order by $label
-                    return
-                        <works>
-                            <id>{ $id }</id>
-                            <label>{$label}</label>
-                        </works>
+                   catalog:works-by(xs:string($author-rec/mads:identifier[@type='citeurn']))
                 }
                 {
                     for $foa in $author-rec/mads:fieldOfActivity
